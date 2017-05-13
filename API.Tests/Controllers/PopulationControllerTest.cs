@@ -32,9 +32,7 @@ namespace API.Tests
         {
             // Setup
             var result = new PersonViewModel[0];
-            var ctrl = GetController();
-            ctrl.Manager = Mock.Of<IPopulationManager>();
-            ctrl.Specs = Mock.Of<IPopulationSpecificationProvider>();
+            var ctrl = GetController(Mock.Of<IPopulationSpecificationProvider>());
             Mock.Get(ctrl.Manager)
                 .Setup(c => c.Filter(It.IsAny<ISpecification<V_Population>>(), 
                     It.IsAny<int>(), It.IsAny<int>(), It.IsAny<SortSpecification[]>()))

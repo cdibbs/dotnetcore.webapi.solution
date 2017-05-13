@@ -29,11 +29,10 @@ namespace API.Tests.AuthManagers
             Mock.Get(user)
                 .Setup(u => u.IsInRole(It.Is<string>(s => !roles.Contains(s))))
                 .Returns(false);
-            var AuthM = new UserRoleAuthManager()
-            {
-                User = user,
-                Logger = Mock.Of<ILogger>()
-            };
+            var AuthM = new UserRoleAuthManager(
+                user: user,
+                logger: Mock.Of<ILogger>()
+            );
             return AuthM;
         }
 
@@ -202,7 +201,7 @@ namespace API.Tests.AuthManagers
         public void GenerateFilterUpdate_SameAsGet()
         {
             var filter = Specification<User>.All();
-            var m = new Mock<UserAuthManager>();
+            var m = new Mock<UserAuthManager>(Mock.Of<IPrincipal>(), Mock.Of<ILogger>());
             m.Setup(c => c.GenerateFilterUpdate()).CallBase();
             m.Setup(c => c.GenerateFilterGet())
                 .Returns(filter)

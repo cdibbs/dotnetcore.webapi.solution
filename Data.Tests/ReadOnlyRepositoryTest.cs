@@ -19,9 +19,7 @@ namespace Data.Tests
         public ReadOnlyRepository GetRepoWithData<T>(List<T> data, string name) where T : ViewEntity
         {
             var logger = Mock.Of<ILogger>();
-            var optsBuilder = new DbContextOptionsBuilder<ReadOnlyDataContext>();
-            optsBuilder.UseInMemoryDatabase(name);
-            var dc = new ReadOnlyDataContext(optsBuilder.Options);
+            var dc = new ReadOnlyDataContext(test: true, testName: name);
             data.ForEach(c => dc.Add(c));
             dc.SaveChanges();
 
@@ -32,9 +30,7 @@ namespace Data.Tests
         public Mock<ReadOnlyRepository> GetRepoMock<T>(string name, bool setupIncl = false) where T : ViewEntity
         {
             var logger = Mock.Of<ILogger>();
-            var optsBuilder = new DbContextOptionsBuilder<ReadOnlyDataContext>();
-            optsBuilder.UseInMemoryDatabase(name);
-            var dc = new ReadOnlyDataContext(optsBuilder.Options);
+            var dc = new ReadOnlyDataContext(test: true, testName: name);
             var repoM = new Mock<ReadOnlyRepository>(dc);
             if (setupIncl)
                 repoM.Setup(m => m.Include(It.IsAny<IQueryable<T>>(), It.IsAny<Expression<Func<T, object>>>()))

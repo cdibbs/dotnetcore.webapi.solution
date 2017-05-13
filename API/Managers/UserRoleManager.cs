@@ -11,7 +11,7 @@ namespace API.Managers
 {
     public class UserRoleManager : BaseManager<UserRole>
     {
-        public UserRoleManager(IRepository repo, IMapper mapper, IValidator<UserRole> validator, ILogger logger, IAuthManager<UserRole> auth, IBaseSpecificationProvider<UserRole> specs)
+        public UserRoleManager(IRepository repo, IMapper mapper, IValidator<UserRole> validator, ILogger logger, IAuthManager<UserRole> auth, IUserRoleSpecificationProvider specs)
             : base(repo, mapper, validator, logger, auth, specs)
         {
             FilterIncludes = new Expression<Func<UserRole, object>>[] {

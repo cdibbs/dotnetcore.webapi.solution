@@ -17,7 +17,7 @@ using API.SpecificationProviders;
 namespace API.Tests
 {
     public abstract class BaseControllerTest<T, U, UKey> //: BaseApiController<U, UViewModel> 
-        where T: BaseApiController<U, UKey>, new()
+        where T: BaseApiController<U, UKey>
         where U: IEntity
     {
         protected MapperConfiguration MapperConfig { get; set; }
@@ -31,14 +31,13 @@ namespace API.Tests
             return mockIdentity;
         }
 
-        protected virtual T GetController()
+        protected virtual T GetController(IBaseSpecificationProvider<U> specs)
         {
             Assert.IsNotNull(MapperConfig, "You must setup MapperConfig in a TestInitialize or TestMethod.");
-            var c = new T()
-            {
-                Manager = Mock.Of<IBaseManager<U, UKey>>(),
-                Specs = Mock.Of<IBaseSpecificationProvider<U>>()
-            };
+            var c = (T)Activator.CreateInstance(typeof(T), new object[] {
+                Mock.Of<IBaseManager<U, UKey>>(),
+                specs
+            });
             c.ControllerContext = new ControllerContext()
             {
                 HttpContext = new DefaultHttpContext()

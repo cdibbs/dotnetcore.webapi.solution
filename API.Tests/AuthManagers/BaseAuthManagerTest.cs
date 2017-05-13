@@ -22,11 +22,10 @@ namespace API.Tests.AuthManagers
             Mock.Get(user)
                 .Setup(u => u.IsInRole(It.Is<string>(s => ! roles.Contains(s))))
                 .Returns(false);
-            var AuthM = new BaseAuthManager<User>()
-            {
-                User = user,
-                Logger = Mock.Of<ILogger>()
-            };
+            var AuthM = new BaseAuthManager<User>(
+                user: user,
+                logger: Mock.Of<ILogger>()
+            );
             return AuthM;
         }
 

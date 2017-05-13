@@ -12,6 +12,12 @@ namespace API.Authorization
         public IPrincipal User { get; set; }
         public ILogger Logger { get; set; }
 
+        public BaseAuthManager(IPrincipal user, ILogger logger)
+        {
+            this.User = user;
+            this.Logger = logger;
+        }
+
         public string Requestor => $"{User?.Identity?.Name ?? "[Unknown]"}";
         private string Target => typeof (T).FullName;
 

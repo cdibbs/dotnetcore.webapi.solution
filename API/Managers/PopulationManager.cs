@@ -16,7 +16,7 @@ using System.Linq.Expressions;
 
 namespace API.Managers
 {
-    public class PopulationManager : IPopulationManager
+    public class PopulationManager : IPopulationManager, IBaseManager<V_Population, string>
     {
         public IReadOnlyRepository Repo { get; set; }
         public IMapper Mapper { get; set; }

@@ -8,13 +8,24 @@ namespace Data
 {
     public class DataContext : DbContext, IDataContext
     {
-        private string Username { get; set; }
+        private IPrincipal User { get; set; }
         private ILogger Logger { get; set; }
+        private bool Test;
+        private string TestName;
 
-        public DataContext(string username, ILogger logger, DbContextOptions opts = null) : base(opts)
+        public DataContext(IPrincipal user, ILogger logger, bool test = false, string testName = "") : base()
         {
-            this.Username = username;
+            this.User = user;
             this.Logger = logger;
+            this.Test = test;
+            this.TestName = testName;
+
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder opts)
+        {
+            if (this.Test)
+                opts.UseInMemoryDatabase(TestName);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -40,13 +51,14 @@ namespace Data
         public void Save()
         {
             User u = null;
+            var username = this.User?.Identity?.Name;
             try
-            {
-                u = Users.FirstOrDefault(user => user.Username == this.Username);
+            {               
+                u = Users.FirstOrDefault(user => user.Username == username);
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error loading user.");
+                Logger.Error(ex, $"Error loading user: {username}.");
             }
 
             if (u == null)

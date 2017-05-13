@@ -4,7 +4,20 @@ namespace Data.Repositories.ReadOnly
 {
     public class ReadOnlyDataContext : DbContext, IReadOnlyDataContext
     {
-        public ReadOnlyDataContext(DbContextOptions opts) : base(opts) { }
+        private bool Test;
+        private string TestName;
+
+        public ReadOnlyDataContext(bool test = false, string testName = "")
+        {
+            this.Test = test;
+            this.TestName = testName;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder opts)
+        {
+            if (this.Test)
+                opts.UseInMemoryDatabase(TestName);
+        }
 
         public DbSet<V_Population> Population { get; set; }
 

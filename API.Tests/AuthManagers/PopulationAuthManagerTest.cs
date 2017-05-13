@@ -27,11 +27,10 @@ namespace API.Tests.AuthManagers
             Mock.Get(user)
                 .Setup(u => u.IsInRole(It.Is<string>(s => !roles.Contains(s))))
                 .Returns(false);
-            var AuthM = new PopulationAuthManager()
-            {
-                User = user,
-                Logger = Mock.Of<ILogger>()
-            };
+            var AuthM = new PopulationAuthManager(
+                user: user,
+                logger: Mock.Of<ILogger>()
+            );
             return AuthM;
         }
 

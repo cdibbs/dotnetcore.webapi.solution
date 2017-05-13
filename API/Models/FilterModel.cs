@@ -8,7 +8,9 @@ namespace API.Models
         public int? PageSize { get; set; } = 20;
         public string[] Keywords { get; set; }
 
-
+        /// <summary>
+        /// An array of SortSpecification models.
+        /// </summary>
         public virtual SortSpecification[] SortSpecifications { get; set; }
             = new [] {
                 new SortSpecification("Id", SortDirection.Ascending)

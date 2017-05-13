@@ -4,7 +4,7 @@ using Specifications;
 
 namespace API.SpecificationProviders
 {
-    public interface IPopulationSpecificationProvider
+    public interface IPopulationSpecificationProvider : IBaseSpecificationProvider<V_Population>
     {
         ISpecification<T> ByUserId<T>(string userId) where T : V_Population;
         ISpecification<T> PopulationByFilter<T>(PopulationFilterModel filter) where T : V_Population;

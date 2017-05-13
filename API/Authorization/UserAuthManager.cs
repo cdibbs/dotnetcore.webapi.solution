@@ -1,11 +1,17 @@
-﻿using API.Models;
+﻿using System.Security.Principal;
+using API.Models;
 using Data;
+using Serilog;
 using Specifications;
 
 namespace API.Authorization
 {
     public class UserAuthManager : BaseAuthManager<User>
     {
+        public UserAuthManager(IPrincipal user, ILogger logger) : base(user, logger)
+        {
+        }
+
         public override bool MayGet => IsInRole(RoleType.Admin);
         public override bool MayAdd => IsInRole(RoleType.Admin);
         public override bool MayUpdate => MayAdd;

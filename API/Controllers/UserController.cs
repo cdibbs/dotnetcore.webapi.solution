@@ -1,14 +1,13 @@
-﻿using API.Models;
+﻿using API.Managers;
+using API.Models;
 using API.Models.FilterModels;
 using API.Models.InputModels;
 using API.Models.ViewModels;
+using API.SpecificationProviders;
 using Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Net;
-using API.Managers;
-using API.SpecificationProviders;
 
 namespace API.Controllers
 {
@@ -16,7 +15,7 @@ namespace API.Controllers
     [Route("[controller]")]
     public class UserController : BaseApiController<User, long>
     {
-        public IUserSpecificationProvider Specs { get; set; }
+        public new IUserSpecificationProvider Specs { get; set; }
         public UserController(IBaseManager<User, long> manager, IUserSpecificationProvider specs) : base(manager)
         {
             this.Specs = specs;
@@ -29,7 +28,7 @@ namespace API.Controllers
         /// <param name="filter">A user filter.</param>
         /// <returns>An ordered, paged list (size filter.PageSize) of user view models.</returns>
         [SwaggerResponse(200, typeof(UserViewModel[]), "An array of User view models.")]
-        [AcceptVerbs("SEARCH")]
+        [HttpGet, Route("search")]
         public IViewModel<User, long>[] Get([FromQuery] UserFilterModel filter)
             => Manager.Filter(Specs.UsersByFilter<User>(filter), filter.Page ?? 0, filter.PageSize ?? 10, filter.SortSpecifications);
 

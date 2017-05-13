@@ -8,16 +8,17 @@ A project to bootstrap an MSSQL-DB-based WebAPI, complete with unit and integrat
 - [Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) auto-generated API documentation at [http://localhost:50777/swagger/ui/index](http://localhost:50777/swagger/ui/index).
 - [Serilog](https://github.com/serilog/serilog) logging
   - Uses [Serilog.Settings.Configuration](https://github.com/serilog/serilog-settings-configuration).
-- [AutoFac](https://github.com/autofac/Autofac) for Dependency Injection.
+- [AutoFac](https://github.com/autofac/Autofac) for Dependency Injection, with
+  - [AutoFac.Extensions.DependencyInjection](https://github.com/autofac/Autofac.Extensions.DependencyInjection)
 - Database access through [Microsoft.EntityFrameworkCore](https://github.com/aspnet/EntityFramework).
 
 ### Code features
-- API uses "Manager" endpoint architecture to facilitate testing and code reuse (see BaseManager).
+- API code abstracted away from endpoints to facilitate code reuse and testing.
 - Data project uses generic repo with Spec pattern for query code reuse and testing.
-- IoC: Dependency Injection (DI) through Ninject.
-- Pure OWIN app (no Global.asax)
-- Unit and integration test suite with >120 tests covering all base functionality, particularly the
-  API's BaseManager class and the Repository generic query methods.
+- Code implements proper software engineering patterns including IoC and SoC, yet
+  tries to remain pragmatic and transparent.
+- Unit test suite with >120 tests covering all base functionality. Integration tests will be added
+  once dotnet core supports the [required items](https://github.com/Microsoft/testfx/issues/96).
 
 ## Requirements
 
@@ -30,7 +31,7 @@ To install this template:
 
 1. Open powershell.
 2. Clone this repository:
-   `git clone https://git.its.uiowa.edu/scm/its-ad/appdev.basetemplate.git`
+   `git clone https://github.com/cdibbs/dotnetcore.webapi.solution.git`
 3. From outside the cloned directory, run `dotnet new -i ./AppDev.BaseTemplate`.
 4. Create a new directory for your WebAPI solution, and change to that directory. Note: The solution will be named after the directory
    unless you use the `-n [my-proj-name]` option with the `dotnet` command.
@@ -40,4 +41,3 @@ To install this template:
 
 ## Authors
 - Chris Dibbern
-- Yan Li

@@ -11,7 +11,7 @@ namespace API.Controllers
     [Route("[controller]")]
     public class RoleController : BaseApiController<Role, long>
     {
-        public IRoleSpecificationProvider Specs { get; set; }
+        public new IRoleSpecificationProvider Specs { get; set; }
         public RoleController(IBaseManager<Role, long> manager, IRoleSpecificationProvider specs) : base(manager)
         {
             this.Specs = specs;
@@ -23,7 +23,7 @@ namespace API.Controllers
         /// <param name="filter">A roles filter.</param>
         /// <returns>An ordered, paged list (size filter.PageSize) of role view models.</returns>
         [SwaggerResponse(200, typeof(RoleViewModel[]), "An array of Role view models.")]
-        [HttpGet]
+        [HttpGet, Route("search")]
         public IViewModel<Role, long>[] Get([FromQuery] FilterModel filter)
             => Manager.Filter(Specs.RolesByFilter<Role>(filter), filter.Page ?? 0, filter.PageSize ?? 10, filter.SortSpecifications);
     }

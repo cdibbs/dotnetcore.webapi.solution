@@ -19,13 +19,8 @@ namespace Data.Tests
         public Repository GetRepoWithData<T>(List<T> data, string name) where T : BaseEntity
         {
             var logger = Mock.Of<ILogger>();
-            var optsBuilder = new DbContextOptionsBuilder<DataContext>();
-            optsBuilder.UseInMemoryDatabase($"FilterByIsDeleted{name}");
-            var dc = new DataContext("test", logger, optsBuilder.Options);
-
-            var ndOptsBuilder = new DbContextOptionsBuilder<AllDataContext>();
-            ndOptsBuilder.UseInMemoryDatabase($"Unfiltered{name}");
-            var noDeletesDc = new AllDataContext(ndOptsBuilder.Options);
+            var dc = new DataContext("test", logger, test: true, testName: $"FilterByIsDeleted{name}");
+            var noDeletesDc = new AllDataContext(test: true, testName: $"Unfiltered{name}");
 
             data.ForEach(c => dc.Add(c));
             data.ForEach(c => { if (!c.IsDeleted) noDeletesDc.Add(c); });
@@ -39,13 +34,8 @@ namespace Data.Tests
         public Mock<Repository> GetRepoMock<T>(string name, bool setupNoTrac = false, bool setupIncl = false) where T : BaseEntity
         {
             var logger = Mock.Of<ILogger>();
-            var optsBuilder = new DbContextOptionsBuilder<DataContext>();
-            optsBuilder.UseInMemoryDatabase($"FilterByIsDeleted{name}");
-            var dc = new DataContext("test", logger, optsBuilder.Options);
-
-            var ndOptsBuilder = new DbContextOptionsBuilder<AllDataContext>();
-            ndOptsBuilder.UseInMemoryDatabase($"Unfiltered{name}");
-            var noDeletesDc = new AllDataContext(ndOptsBuilder.Options);
+            var dc = new DataContext("test", logger, test: true, testName: $"FilterByIsDeleted{name}");
+            var noDeletesDc = new AllDataContext(test: true, testName: $"Unfiltered{name}");
 
             var repoM = new Mock<Repository>(dc, noDeletesDc);
             if (setupNoTrac)

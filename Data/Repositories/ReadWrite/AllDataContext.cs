@@ -4,8 +4,20 @@ namespace Data
 {
     public class AllDataContext : DbContext, ISoftDeletedDataContext
     {
-        public AllDataContext(DbContextOptions opts = null) : base(opts)
-        { }
+        private bool Test;
+        private string TestName;
+
+        public AllDataContext(bool test = false, string testName = "")
+        {
+            this.Test = test;
+            this.TestName = testName;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder opts)
+        {
+            if (this.Test)
+                opts.UseInMemoryDatabase(TestName);
+        }
 
         public DbSet<User> Users { get; set; }
 

@@ -11,16 +11,16 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace API.Controllers
 {
     [Authorize]
+    [Route("[controller]")]
     public class PopulationController : BaseApiController<V_Population, string>
     {
-        public IPopulationSpecificationProvider Specs { get; set; }
-        public PopulationController() : base(null) { }
+        public new IPopulationSpecificationProvider Specs { get; set; }
         public PopulationController(IBaseManager<V_Population, string> manager, IPopulationSpecificationProvider specs) : base(manager)
         {
             this.Specs = specs;
         }
 
-        [HttpGet]
+        [HttpGet, Route("search")]
         [SwaggerResponse(200, typeof(PersonViewModel[]), "Array of ViewModels matching the filter.")]
         public IViewModel<V_Population, string>[] Get([FromQuery] PopulationFilterModel filter)
             => Manager.Filter(Specs.PopulationByFilter<V_Population>(filter), filter.Page ?? 0, filter.PageSize ?? 10, filter.SortSpecifications);

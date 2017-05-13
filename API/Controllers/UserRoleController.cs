@@ -13,7 +13,7 @@ namespace API.Controllers
     [Route("[controller]")]
     public class UserRoleController : BaseApiController<UserRole, long>
     {
-        public IUserRoleSpecificationProvider Specs { get; set; }
+        public new IUserRoleSpecificationProvider Specs { get; set; }
         public UserRoleController(IBaseManager<UserRole, long> manager, IUserRoleSpecificationProvider specs) : base(manager)
         {
             this.Specs = specs;
@@ -25,14 +25,8 @@ namespace API.Controllers
         /// <param name="filter">A user roles filter.</param>
         /// <returns>An ordered, paged list (size filter.PageSize) of user role view models.</returns>
         [SwaggerResponse(200, typeof(UserRoleViewModel[]), "An array of UserRole view models.")]
-        [HttpGet] public IViewModel<UserRole, long>[] Get([FromQuery] FilterModel filter)
+        [HttpGet, Route("search")] public IViewModel<UserRole, long>[] Get([FromQuery] FilterModel filter)
             => Manager.Filter(Specs.UserRolesByFilter<UserRole>(filter), filter.Page ?? 0, filter.PageSize ?? 10, filter.SortSpecifications);
-
-        //get userrole by userid
-        //[SwaggerResponse(HttpStatusCode.OK, "An array of UserRole for one user view models.",
-        //    typeof(UserRoleViewModel[]))]
-        //[HttpGet]
-        //public IViewModel<UserRole, long>[] Get(long id) => Manager.Get(id);
 
 
         /// <summary>

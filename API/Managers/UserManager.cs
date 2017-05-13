@@ -27,7 +27,7 @@ namespace API.Managers
             UseHardDeletes = false;
         }
 
-        // Add is overridden because we might need to set IsDeleted = true on an existing record
+        // Add is overridden because we might need to set IsDeleted = false on an existing record
         // instead of actually inserting a new user.
         public override IViewModel<User, long> Add(BaseInputModel<User> input)
         {
