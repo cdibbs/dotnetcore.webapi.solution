@@ -1,7 +1,5 @@
 ﻿using Data.Utilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Serilog;
 using Specifications;
@@ -10,20 +8,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
+using Data.QueryableExtensions;
+using Xunit;
 
 namespace Data.Tests
 {
-    [TestClass]
     public class RepositoryTest
     {
-        public Repository GetRepoWithData<T>(List<T> data, string name) where T : BaseEntity
+        public RepositoryTest() // reset anything static to a known state before each test
+        {
+            // Extension method overrides
+            QueryableExtensions.QueryableExtensions.Includer = new NullIncluder();
+            QueryableExtensions.QueryableExtensions.FirstOrDefaulter = new DbFirstOrDefaulter();
+        }
+
+        protected Repository GetRepoWithData<T>(List<T> data, string name) where T : BaseEntity
         {
             var logger = Mock.Of<ILogger>();
-            var dc = new DataContext("test", logger, test: true, testName: $"FilterByIsDeleted{name}");
+            var tu = Mock.Of<IPrincipal>();
+            var dc = new DataContext(tu, logger, test: true, testName: $"FilterByIsDeleted{name}");
             var noDeletesDc = new AllDataContext(test: true, testName: $"Unfiltered{name}");
 
-            data.ForEach(c => dc.Add(c));
-            data.ForEach(c => { if (!c.IsDeleted) noDeletesDc.Add(c); });
+            data.ForEach(c => dc.ISet<T>().Add(c));
+            data.ForEach(c => { if (!c.IsDeleted) noDeletesDc.ISet<T>().Add(c); });
             dc.SaveChanges();
             noDeletesDc.SaveChanges();
 
@@ -31,10 +38,11 @@ namespace Data.Tests
             return repo;
         }
 
-        public Mock<Repository> GetRepoMock<T>(string name, bool setupNoTrac = false, bool setupIncl = false) where T : BaseEntity
+        protected Mock<Repository> GetRepoMock<T>(string name, bool setupNoTrac = false) where T : BaseEntity
         {
             var logger = Mock.Of<ILogger>();
-            var dc = new DataContext("test", logger, test: true, testName: $"FilterByIsDeleted{name}");
+            var tu = Mock.Of<IPrincipal>();
+            var dc = new DataContext(tu, logger, test: true, testName: $"FilterByIsDeleted{name}");
             var noDeletesDc = new AllDataContext(test: true, testName: $"Unfiltered{name}");
 
             var repoM = new Mock<Repository>(dc, noDeletesDc);
@@ -42,14 +50,24 @@ namespace Data.Tests
                 repoM.Setup(m => m.NoTracking(It.IsAny<DbSet<T>>()))
                     .Returns(dc.ISet<T>())
                     .Verifiable();
-            if (setupIncl)
-                repoM.Setup(m => m.Include(It.IsAny<IQueryable<T>>(), It.IsAny<Expression<Func<T, object>>>()))
-                    .Returns(dc.ISet<T>())
-                    .Verifiable();
             return repoM;
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
+        public void AddEntity_AddsToUnderlyingContext()
+        {
+            var ds = Mock.Of<DbSet<User>>();
+            var dcm = new Mock<DataContext>(Mock.Of<IPrincipal>(), Mock.Of<ILogger>(), false, "");
+            dcm.Setup(d => d.ISet<User>()).Returns(ds);
+            var repo = new Repository(dcm.Object, Mock.Of<ISoftDeletedDataContext>());
+            var user = new User();
+
+            repo.AddEntity(user);
+
+            Mock.Get(ds).Verify(d => d.Add(It.Is<User>(u => u == user)));
+        }
+
+        [Fact]
         public void Page_SortsAsRequested()
         {
             // Setup
@@ -64,16 +82,16 @@ namespace Data.Tests
             {
                 {"Created", (Expression<Func<User, DateTime>>)(t => t.Created)}
             };
-            var f = new SortFactory<User>(new[] { new SortSpecification("Created", SortDirection.Ascending) }, a);
+            var f = new SortFactory<User, long>(new[] { new SortSpecification("Created", SortDirection.Ascending) }, a);
 
             // Test
             var results = repo.Page(Specification<User>.All(), 0, 3, f);
 
             // Assert
-            Assert.IsTrue(corresp.OrderBy(c => c.Created).SequenceEqual(results, new EqComparer<User>()));
+            Assert.True(corresp.OrderBy(c => c.Created).SequenceEqual(results, new EqComparer<User>()));
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void Page_SortsDescAsRequested()
         {
             var r = new List<Role>()
@@ -87,14 +105,14 @@ namespace Data.Tests
             {
                 { "Created", (Expression<Func<Role, DateTime>>)(t => t.Created) }
             };
-            var f = new SortFactory<Role>(new[] { new SortSpecification("Created", SortDirection.Descending) }, a);
+            var f = new SortFactory<Role, long>(new[] { new SortSpecification("Created", SortDirection.Descending) }, a);
 
             var results = repo.Page(Specification<Role>.All(), 0, 3, f);
 
-            Assert.IsTrue(r.OrderByDescending(c => c.Created).SequenceEqual(results, new EqComparer<Role>()));
+            Assert.True(r.OrderByDescending(c => c.Created).SequenceEqual(results, new EqComparer<Role>()));
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void Page_Pages()
         {
             var r = new List<User>()
@@ -109,11 +127,11 @@ namespace Data.Tests
 
             var results = repo.Page(Specification<User>.All(), 1, 2);
 
-            Assert.IsTrue(results.First().Id == 3);
-            Assert.IsTrue(results.ElementAt(1).Id == 4);
+            Assert.True(results.First().Id == 3);
+            Assert.True(results.ElementAt(1).Id == 4);
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void Page_Filters()
         {
             var r = new List<User>()
@@ -128,11 +146,11 @@ namespace Data.Tests
 
             var results = repo.Page(Specification<User>.Start(c => c.Id > 3), 0, 2);
 
-            Assert.IsTrue(results.First().Id == 4);
-            Assert.IsTrue(results.ElementAt(1).Id == 5);
+            Assert.True(results.First().Id == 4);
+            Assert.True(results.ElementAt(1).Id == 5);
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void Page_NoTrackingDefault()
         {
             var repoM = GetRepoMock<Role>(nameof(Page_NoTrackingDefault));
@@ -140,7 +158,7 @@ namespace Data.Tests
             repoM.Verify();
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void Page_TrackingIfSpecified()
         {
             var repoM = GetRepoMock<Role>(nameof(Page_TrackingIfSpecified));
@@ -148,7 +166,7 @@ namespace Data.Tests
             repoM.Verify(m => m.NoTracking(It.IsAny<DbSet<Role>>()), Times.Never);
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void Page_Includes()
         {
             var repoM = GetRepoMock<Role>(nameof(Page_Includes));
@@ -156,7 +174,7 @@ namespace Data.Tests
             repoM.Verify();
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void FindOne_TrackingIfSpecified()
         {
             var repoM = GetRepoMock<Role>(nameof(FindOne_TrackingIfSpecified));
@@ -164,7 +182,7 @@ namespace Data.Tests
             repoM.Verify(m => m.NoTracking(It.IsAny<DbSet<Role>>()), Times.Never);
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void FindOne_NoTrackingDefault()
         {
             var repoM = GetRepoMock<Role>(nameof(FindOne_NoTrackingDefault), setupNoTrac: true);
@@ -172,15 +190,18 @@ namespace Data.Tests
             repoM.Verify();
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void FindOne_Includes()
         {
-            var repoM = GetRepoMock<Role>(nameof(FindOne_Includes), setupIncl: true);
+            QueryableExtensions.QueryableExtensions.Includer = Mock.Of<QueryableExtensions.IIncluder>();
+            var repoM = GetRepoMock<Role>(nameof(FindOne_Includes));
             repoM.Object.FindOne<Role>(Specification<Role>.All(), includes: r => r.UserRoles);
-            repoM.Verify();
+            Mock.Get(QueryableExtensions.QueryableExtensions.Includer)
+                .Verify(i => i.Include(It.IsAny<IQueryable<Role>>(), It.IsAny<Expression<Func<Role, object>>>()), Times.Once);
+
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void FindOne_Filters()
         {
             var r = new List<User>()
@@ -195,10 +216,10 @@ namespace Data.Tests
 
             var result = repo.FindOne<User>(Specification<User>.Start(c => c.Id == 3));
 
-            Assert.AreEqual(result.Id, 3);
+            Assert.Equal(result.Id, 3);
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void FindAll_ExcludesSoftDeleted()
         {
             // Awaiting EFCore 2.0 for reimplementation (life-cycle hooks and global filters).
@@ -214,10 +235,10 @@ namespace Data.Tests
 
             var results = repo.FindAll<User>(Specification<User>.Start(c => c.Id > 2), incSoftDel:false);
 
-            Assert.AreEqual(1, results.First().Id); */
+            Assert.Equal(1, results.First().Id); */
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void FindAll_TrackingIfSpecified()
         {
             var repoM = GetRepoMock<Role>(nameof(FindAll_TrackingIfSpecified), setupNoTrac: true);
@@ -225,7 +246,7 @@ namespace Data.Tests
             repoM.Verify(m => m.NoTracking(It.IsAny<DbSet<Role>>()), Times.Never);
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void FindAll_NoTrackingDefault()
         {
             var repoM = GetRepoMock<Role>(nameof(FindAll_NoTrackingDefault), setupNoTrac: true);
@@ -233,15 +254,17 @@ namespace Data.Tests
             repoM.Verify();
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void FindAll_Includes()
         {
-            var repoM = GetRepoMock<Role>(nameof(FindAll_Includes), setupIncl: true);
+            QueryableExtensions.QueryableExtensions.Includer = Mock.Of<QueryableExtensions.IIncluder>();
+            var repoM = GetRepoMock<Role>(nameof(FindOne_Includes));
             repoM.Object.FindAll<Role>(Specification<Role>.All(), includes: r => r.UserRoles);
-            repoM.Verify();
+            Mock.Get(QueryableExtensions.QueryableExtensions.Includer)
+                .Verify(i => i.Include(It.IsAny<IQueryable<Role>>(), It.IsAny<Expression<Func<Role, object>>>()), Times.Once);
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void FindAll_Filters()
         {
             var r = new List<User>()
@@ -256,11 +279,11 @@ namespace Data.Tests
 
             var results = repo.FindAll<User>(Specification<User>.Start(c => c.Id > 3));
 
-            Assert.AreEqual(results.First().Id, 4);
-            Assert.AreEqual(results.Skip(1).First().Id, 5);
+            Assert.Equal(results.First().Id, 4);
+            Assert.Equal(results.Skip(1).First().Id, 5);
         }
 
-        [TestMethod, TestCategory("Repository")]
+        [Fact]
         public void Delete_NullEntityIgnored()
         {
             var r = new List<User>()
@@ -275,11 +298,11 @@ namespace Data.Tests
 
             var result = repo.Delete<User>(Specification<User>.Start(c => c.Id == 7));
 
-            Assert.IsNull(result);
+            Assert.Null(result);
         }
 
-        [TestMethod, TestCategory("Repository")]
-        public void Delete_RemovesFromSet()
+        [Fact]
+        public void Delete_Soft_SetsIsDeleted()
         {
             var r = new List<User>()
             {
@@ -289,11 +312,64 @@ namespace Data.Tests
                 new User() { Id = 4},
                 new User() { Id = 5},
             };
-            var repo = GetRepoWithData(r, nameof(Delete_RemovesFromSet));
+            var repo = GetRepoWithData(r, nameof(Delete_Soft_SetsIsDeleted));
 
             var result = repo.Delete<User>(Specification<User>.Start(c => c.Id == 3));
 
-            Assert.AreEqual(3, result.Id);
+            Assert.Equal(3, result.Id);
+            Assert.True(result.IsDeleted);
+        }
+
+        [Theory]
+        [InlineData(true, 0, 1)]
+        [InlineData(false, 1, 0)]
+        public void Save_CallsAppropriateDCSave(Boolean allData, int allDataTimes, int excludeDelsTimes)
+        {
+            var dc = Mock.Of<IDataContext>(d => d.SaveChanges() == 0);
+            var noDeletesDc = Mock.Of<ISoftDeletedDataContext>(d => d.SaveChanges() == 0);
+
+            var repo = new Repository(dc, noDeletesDc);
+            repo.Save(allData);
+
+            Mock.Get(dc).Verify(d => d.Save(), Times.Exactly(allDataTimes));
+            Mock.Get(noDeletesDc).Verify(d => d.Save(), Times.Exactly(excludeDelsTimes));
+        }
+
+        [Fact]
+        public void Delete_CallsRemoveWhenHardDelete()
+        {
+            var model = new User();
+            var df = Mock.Of<IFirstOrDefaulter>(i =>
+                i.FirstOrDefault<User>(It.IsAny<IQueryable<User>>(),
+                    It.IsAny<Expression<Func<User, bool>>>()) == model);
+            var dbset = Mock.Of<DbSet<User>>();
+            var dc = Mock.Of<IDataContext>(d => d.ISet<User>() == dbset);
+            var noDeletesDc = Mock.Of<ISoftDeletedDataContext>(d => d.SaveChanges() == 0);
+            var repo = new Repository(dc, noDeletesDc);
+            QueryableExtensions.QueryableExtensions.FirstOrDefaulter = df;
+
+            repo.Delete(Specification<User>.True, true);
+
+            Mock.Get(dbset).Verify(d => d.Remove(It.IsAny<User>()), Times.Once);
+        }
+
+        [Fact]
+        public void Delete_IncludesAll()
+        {
+            var incm = new Mock<IIncluder>();
+            incm.Setup(i => i.Include(It.IsAny<IQueryable<User>>(), It.IsAny<Expression<Func<User, object>>>()))
+                .Returns((IQueryable<User> a, Expression<Func<User, object>> expr) => a);
+            var df = Mock.Of<IFirstOrDefaulter>();
+            var dbset = Mock.Of<DbSet<User>>();
+            var dc = Mock.Of<IDataContext>(d => d.ISet<User>() == dbset);
+            var noDeletesDc = Mock.Of<ISoftDeletedDataContext>(d => d.SaveChanges() == 0);
+            var repo = new Repository(dc, noDeletesDc);
+            QueryableExtensions.QueryableExtensions.Includer = incm.Object;
+            QueryableExtensions.QueryableExtensions.FirstOrDefaulter = df;
+
+            repo.Delete(Specification<User>.True, false, u => u.UserRoles, u => u.UserRoles.Select(ur => ur.User));
+
+            incm.Verify(i => i.Include(It.IsAny<IQueryable<User>>(), It.IsAny<Expression<Func<User, object>>>()), Times.Exactly(2));
         }
     }
 }

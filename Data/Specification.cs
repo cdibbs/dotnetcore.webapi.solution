@@ -19,8 +19,10 @@ namespace Specifications
         /// </summary>
         public object Metadata { get; set; }
 
-        public static ISpecification<T> All() => Specification<T>.Start(t => true, true);
-        public static ISpecification<T> None() => Specification<T>.Start(t => false, false); 
+        public static ISpecification<T> All() => True;
+        public static ISpecification<T> True => Start(t => true, true);
+        public static ISpecification<T> None() => False;
+        public static ISpecification<T> False => Start(t => false, false);
 
         public static ISpecification<T> Start(Expression<Func<T, bool>> expression, object Metadata = null)
         {
@@ -45,12 +47,14 @@ namespace Specifications
             return this;
         }
 
+        // Not sure this is ever used. Removing until proved wrong. CRD 2017-09-08.
+        /*
         public ISpecification<T> And(MethodCallExpression expression)
         {
             _expression = Expression.Lambda<Func<T, bool>>(Expression.AndAlso(_expression.Body, expression),
                                                            _expression.Parameters);
             return this;
-        }
+        }*/
 
         public ISpecification<T> Or(ISpecification<T> spec)
         {
@@ -65,12 +69,13 @@ namespace Specifications
             return this;
         }
 
-        public ISpecification<T> Or(MethodCallExpression expression)
+        // Not sure this is ever used. Removing until proved wrong. CRD 2017-09-08.
+        /*public ISpecification<T> Or(MethodCallExpression expression)
         {
             _expression = Expression.Lambda<Func<T, bool>>(Expression.OrElse(_expression.Body, expression),
                                                            _expression.Parameters);
             return this;
-        }
+        }*/
 
         public override int GetHashCode()
         {

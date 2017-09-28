@@ -44,7 +44,7 @@ namespace API.Tests
                 Mapper,
                 Mock.Of<IValidator<User>>(),
                 Mock.Of<ILogger>(),
-                Mock.Of<IAuthManager<User>>(),
+                Mock.Of<IAuthManager<User, long>>(),
                 Mock.Of<IUserSpecificationProvider>()
             );
         }

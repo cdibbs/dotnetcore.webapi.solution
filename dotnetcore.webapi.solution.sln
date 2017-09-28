@@ -1,20 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{11A3A469-2EBC-4487-A27D-46BF0E1D5D66}"
 	ProjectSection(SolutionItems) = preProject
 		readme.md = readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{6F2B2312-B8ED-478F-83F0-1E68AA9DD373}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{6F2B2312-B8ED-478F-83F0-1E68AA9DD373}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "Data\Data.csproj", "{943D0235-A503-4D2A-8402-12B01904B5D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "Data\Data.csproj", "{943D0235-A503-4D2A-8402-12B01904B5D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API.Tests", "API.Tests\API.Tests.csproj", "{21AEF455-4DF4-4A81-94EE-3C86C0A73F3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API.Tests", "API.Tests\API.Tests.csproj", "{21AEF455-4DF4-4A81-94EE-3C86C0A73F3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.Tests", "Data.Tests\Data.Tests.csproj", "{B63F550C-3EB6-454A-A637-618D5A6B13B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data.Tests", "Data.Tests\Data.Tests.csproj", "{B63F550C-3EB6-454A-A637-618D5A6B13B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,5 +41,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0E2FA76F-752B-43C9-B57C-6C63E15AB8B6}
 	EndGlobalSection
 EndGlobal

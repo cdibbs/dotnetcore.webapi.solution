@@ -5,11 +5,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Data.QueryableExtensions;
 
 namespace Data
 {
+    using QueryableExtensions;
     public class Repository : IRepository
     {
+        static Repository()
+        {
+            QueryableExtensions.QueryableExtensions.Includer = new DbIncluder();
+            QueryableExtensions.QueryableExtensions.FirstOrDefaulter = new DbFirstOrDefaulter();
+        }
+
         public Repository (IDataContext dataContext, ISoftDeletedDataContext sdDataContext)
         {
             DataContext = dataContext;
@@ -34,16 +42,15 @@ namespace Data
             var results = track
                 ? dc.ISet<T>()
                 : NoTracking(dc.ISet<T>());
-
-            foreach (var include in includes) results = Include(results, include);
+            
+            foreach (var include in includes) results = results.Include(include);
             return results.Where(spec.AsExpression());
         }
 
-        // LOL never done it this way, before. We'll see...
         public IEnumerable<T> Page<T>(
             ISpecification<T> spec,
             int offsetPage = 0, int pageSize = 10,
-            ISortFactory<T> sortFactory = null,
+            ISortFactory<T, long> sortFactory = null,
             bool track = false, bool incSoftDel = false, 
             params Expression<Func<T, object>>[] includes)
             where T: BaseEntity
@@ -59,7 +66,6 @@ namespace Data
             var query = results
                     .Skip(offsetPage * pageSize)
                     .Take(pageSize);
-            //var sql = ((System.Data.Entity.Infrastructure.DbQuery<T>)query).ToString();
             return query.ToList();
         }
 
@@ -99,10 +105,10 @@ namespace Data
             (allDataContext ? SdDataContext : DataContext).Save();
         }
 
-        public virtual IQueryable<T> Include<T>(IQueryable<T> collection, Expression<Func<T, object>> propertySpec) where T: class
+        /*public virtual IQueryable<T> Include<T>(IQueryable<T> collection, Expression<Func<T, object>> propertySpec) where T: class
         {
             return collection.Include(propertySpec);
-        }
+        }*/
 
         public virtual IQueryable<T> NoTracking<T>(DbSet<T> collection) where T: class
         {

@@ -1,17 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <ProjectGuid>{943D0235-A503-4D2A-8402-12B01904B5D3}</ProjectGuid>
+    <ProjectGuid>{8A0771C2-2DA5-4BBF-B090-397A0FF36752}</ProjectGuid>
+    <Configurations>Debug;Release;Test</Configurations>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="LINQKit.Core" Version="1.1.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="1.1.2" />
-    <PackageReference Include="Serilog" Version="2.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.0" />
+    <PackageReference Include="Serilog" Version="2.5.0" />
   </ItemGroup>
 </Project>

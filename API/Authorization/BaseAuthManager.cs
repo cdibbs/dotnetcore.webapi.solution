@@ -1,4 +1,5 @@
-﻿using API.Exceptions;
+﻿using System;
+using API.Exceptions;
 using API.Models;
 using Data;
 using Serilog;
@@ -7,7 +8,9 @@ using System.Security.Principal;
 
 namespace API.Authorization
 {
-    public class BaseAuthManager<T> : IAuthManager<T> where T: IEntity
+    public class BaseAuthManager<T, TKey>: IAuthManager<T, TKey>
+        where TKey: IComparable
+        where T: IEntity<TKey>
     {
         public IPrincipal User { get; set; }
         public ILogger Logger { get; set; }

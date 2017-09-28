@@ -33,7 +33,7 @@ namespace API.Tests
                 Mock.Of<IMapper>(),
                 Mock.Of<IValidator<User>>(),
                 Mock.Of<ILogger>(),
-                Mock.Of<IAuthManager<User>>(),
+                Mock.Of<IAuthManager<User, long>>(),
                 Mock.Of<IUserSpecificationProvider>()
             );
         }
@@ -48,7 +48,7 @@ namespace API.Tests
             int expectedPage = 1, expectedPageSize = 10;
             var rm = Mock.Get(Manager.Repo)
                 .Setup(m => m.Page(It.IsAny<ISpecification<User>>(),
-                        It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISortFactory<User>>(), false, false));
+                        It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ISortFactory<User, long>>(), false, false));
             Mock.Get(Manager.Auth)
                 .Setup(a => a.GenerateFilterGet())
                 .Returns(Specification<User>.All());
@@ -57,7 +57,7 @@ namespace API.Tests
             rm.Callback<
                 ISpecification<User>,
                 int, int,
-                ISortFactory<User>,
+                ISortFactory<User, long>,
                 bool, bool, 
                 Expression<Func<User, object>>[]>(
                 (s, p, ps, a, b, b1, i) => { actualSpec = s; actualPage = p; actualPageSize = ps; });
@@ -261,7 +261,7 @@ namespace API.Tests
                 .Verifiable();
             var mrepo = Mock.Get(Manager.Repo);
             mrepo.Setup(m => m.Page(
-                    It.IsAny<ISpecification<User>>(), 0, 0, It.IsAny<ISortFactory<User>>(), false,false))
+                    It.IsAny<ISpecification<User>>(), 0, 0, It.IsAny<ISortFactory<User, long>>(), false,false))
                     .Returns(new List<User>().OrderBy(c => c.Id))
                     .Verifiable();
 
@@ -296,7 +296,7 @@ namespace API.Tests
                     .Verifiable();
 
             // Test
-            Manager.Update(new BaseInputModel<User>());
+            Manager.Update(new BaseInputModel<User, long>());
 
             // Check
             mrepo.Verify();
@@ -347,7 +347,7 @@ namespace API.Tests
                 sp => sp.ById<User>(It.IsAny<long>()) == s);
             var mm = Mock.Get(Manager.Mapper);
             mm.Setup(m => m.Map(
-                It.Is<BaseInputModel<User>>(i => i == input), 
+                It.Is<BaseInputModel<User, long>>(i => i == input), 
                 It.Is<User>(o => o == repoOutput)))
                 .Verifiable();
             var rm = Mock.Get(Manager.Repo);

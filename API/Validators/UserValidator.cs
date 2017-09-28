@@ -7,7 +7,7 @@ namespace API.Validators
 {
     public class UserValidator : IValidator<User>
     {
-        public void Validate(IInputModel<User> input)
+        public void Validate(IInputModel<User, long> input)
         {
             var i = input as UserInputModel;
             if (i == null)

@@ -4,10 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
 
 namespace API.SpecificationProviders
 {
-    public class BaseSpecificationProvider<T> : IBaseSpecificationProvider<T> where T: IEntity
+    public class BaseSpecificationProvider<T, TKey> : IBaseSpecificationProvider<T>
+        where TKey: IComparable
+        where T: IEntity<TKey>
     {
         public ISpecification<T> All() => Specification<T>.All();
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace API.SpecificationProviders
 {
-    public class UserSpecificationProvider : BaseSpecificationProvider<User>, IUserSpecificationProvider
+    public class UserSpecificationProvider : BaseSpecificationProvider<User, long>, IUserSpecificationProvider
     {
         public ISpecification<T> ByUsername<T>(string username) where T : User
             => Specification<T>.Start((T t) => t.Username == username, username);

@@ -16,16 +16,17 @@ using System.Linq.Expressions;
 
 namespace API.Managers
 {
-    public class BaseManager<T> : IBaseManager<T, long> where T : BaseEntity
+    public class BaseManager<T> : IBaseManager<T, long>
+        where T : BaseEntity, IEntity<long>
     {
         public IRepository Repo { get; set; }
         public IMapper Mapper { get; set; }
         public IValidator<T> Validator { get; set; }
         public ILogger Logger { get; set; }
-        public IAuthManager<T> Auth { get; set; }
+        public IAuthManager<T, long> Auth { get; set; }
         public IBaseSpecificationProvider<T> Specs { get; set; }
 
-        public BaseManager(IRepository repo, IMapper mapper, IValidator<T> validator, ILogger logger, IAuthManager<T> auth, IBaseSpecificationProvider<T> specs)
+        public BaseManager(IRepository repo, IMapper mapper, IValidator<T> validator, ILogger logger, IAuthManager<T, long> auth, IBaseSpecificationProvider<T> specs)
         {
             this.Repo = repo;
             this.Mapper = mapper;
@@ -54,7 +55,7 @@ namespace API.Managers
             Logger.Information($"Requesting filtered {typeof(T).FullName}s (@{page} of {pageSize}, {JsonConvert.SerializeObject(sortSpecs?.Select(s => s.ToString()))})");
             Logger.Information($"Filter: {JsonConvert.SerializeObject(spec.Metadata)}");
             //var s = Expression.And((Expression<Func<T, bool>>)((T t) => spec(t)), (Expression<Func<T, bool>>)((T t) => Auth.GenerateFilterGet()(t)));
-            var sortFactory = new SortFactory<T>(sortSpecs, this.SortSelectors);
+            var sortFactory = new SortFactory<T, long>(sortSpecs, this.SortSelectors);
             var res = Repo
                 .Page(spec.And(Auth.GenerateFilterGet()), page, pageSize,
                     sortFactory, includes:FilterIncludes, track: false)
@@ -91,7 +92,7 @@ namespace API.Managers
         /// </summary>
         /// <param name="inputs">New entities to create.</param>
         /// <returns>The saved entities (including their database ids).</returns>
-        public virtual IViewModel<T, long>[] AddMany(BaseInputModel<T>[] inputs)
+        public virtual IViewModel<T, long>[] AddMany(BaseInputModel<T, long>[] inputs)
         {
             Auth.AuthorizeAdd();
             Logger.Information($"Add {typeof(T).FullName}");
@@ -105,7 +106,7 @@ namespace API.Managers
             return Mapper.Map<IViewModel<T>[]>(newObjs);
         }
 
-        public virtual IViewModel<T, long> Add(BaseInputModel<T> input)
+        public virtual IViewModel<T, long> Add(BaseInputModel<T, long> input)
         {
             Auth.AuthorizeAdd();
             Logger.Information($"Add {typeof(T).FullName}");
@@ -118,7 +119,7 @@ namespace API.Managers
         }
 
         // TODO what if target null?
-        public virtual IViewModel<T, long> Update(BaseInputModel<T> input)
+        public virtual IViewModel<T, long> Update(BaseInputModel<T, long> input)
         {
             Auth.AuthorizeUpdate();
             Logger.Information($"Updating {typeof(T).FullName} Id:{input.Id}.");

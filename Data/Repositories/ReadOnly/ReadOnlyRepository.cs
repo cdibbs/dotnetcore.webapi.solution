@@ -2,12 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Specifications;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 
 namespace Data.Repositories.ReadOnly
 {
-    public class ReadOnlyRepository : IReadOnlyRepository
+    public class ReadOnlyRepository<TKey> : IReadOnlyRepository<TKey>
+        where TKey: IComparable
     {
         private IReadOnlyDataContext DataContext { get; set; }
         public ReadOnlyRepository(IReadOnlyDataContext dataContext)
@@ -18,7 +20,7 @@ namespace Data.Repositories.ReadOnly
         public T FindOne<T>(
             ISpecification<T> spec,
             params Expression<Func<T, object>>[] includes)
-            where T : class, IEntity
+            where T : class, IEntity<TKey>
         {
             return FindAll(spec, includes).FirstOrDefault();
         }
@@ -26,7 +28,7 @@ namespace Data.Repositories.ReadOnly
         public IQueryable<T> FindAll<T>(
             ISpecification<T> spec,
             params Expression<Func<T, object>>[] includes)
-            where T : class, IEntity
+            where T : class, IEntity<TKey>
         {
             var results = DataContext.ISet<T>().AsNoTracking();
 
@@ -34,13 +36,12 @@ namespace Data.Repositories.ReadOnly
             return results.Where(spec.AsExpression());
         }
 
-        // LOL never done it this way, before. We'll see...
         public IOrderedQueryable<T> Page<T>(
             ISpecification<T> spec,
-            ISortFactory<T> sortFactory,
+            ISortFactory<T, TKey> sortFactory,
             int offsetPage = 0, int pageSize = 10,
             params Expression<Func<T, object>>[] includes)
-            where T : class, IEntity
+            where T : class, IEntity<TKey>
         {
             var filtered = FindAll(spec, includes);
             var results = sortFactory.ApplySorts(filtered);
@@ -48,10 +49,11 @@ namespace Data.Repositories.ReadOnly
             var query = (IOrderedQueryable<T>) results
                 .Skip(offsetPage*pageSize)
                 .Take(pageSize);
-            //var sql = ((System.Data.Entity.Infrastructure.DbQuery<V_Population>)query).ToString();
             return query;
         }
 
+
+        [ExcludeFromCodeCoverage] // Could rethink this. See ReadOnlyDataContext's use of static methods...
         public virtual IQueryable<T> Include<T>(IQueryable<T> collection, Expression<Func<T, object>> propertySpec) where T: class
         {
             return collection.Include(propertySpec);

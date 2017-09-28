@@ -16,7 +16,7 @@ namespace API.Managers
 {
     public class UserManager : BaseManager<User>, IUserManager
     {
-        public UserManager(IRepository repo, IMapper mapper, IValidator<User> validator, ILogger logger, IAuthManager<User> auth, IUserSpecificationProvider specs)
+        public UserManager(IRepository repo, IMapper mapper, IValidator<User> validator, ILogger logger, IAuthManager<User, long> auth, IUserSpecificationProvider specs)
             : base(repo, mapper, validator, logger, auth, specs)
         {
             FilterIncludes = new Expression<Func<User, object>>[]
@@ -29,7 +29,7 @@ namespace API.Managers
 
         // Add is overridden because we might need to set IsDeleted = false on an existing record
         // instead of actually inserting a new user.
-        public override IViewModel<User, long> Add(BaseInputModel<User> input)
+        public override IViewModel<User, long> Add(BaseInputModel<User, long> input)
         {
             Auth.AuthorizeAdd();
             var uinput = input as UserInputModel;

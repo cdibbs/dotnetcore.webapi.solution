@@ -18,11 +18,11 @@ namespace Data.Tests
         }
     }
 
-    public class ReadOnlyEqComparer<T> : EqualityComparer<T> where T : ViewEntity
+    public class ReadOnlyEqComparer<T> : EqualityComparer<T> where T : IEntity<string>
     {
         public override bool Equals(T x, T y)
         {
-            return x.UserId == y.UserId;
+            return x.Id == y.Id;
         }
 
         public override int GetHashCode(T obj)

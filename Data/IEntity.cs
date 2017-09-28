@@ -1,6 +1,9 @@
-﻿namespace Data
+﻿using System;
+
+namespace Data
 {
-    public interface IEntity
+    public interface IEntity<T> where T: IComparable
     {
+        T Id { get; set; }
     }
 }

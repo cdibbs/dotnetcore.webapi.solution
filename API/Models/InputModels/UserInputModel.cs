@@ -2,7 +2,7 @@
 
 namespace API.Models.InputModels
 {
-    public class UserInputModel : BaseInputModel<User>
+    public class UserInputModel : BaseInputModel<User, long>
     {
         public string Username { get; set; }
         public string First { get; set; }

@@ -6,7 +6,7 @@ using Specifications;
 
 namespace API.Authorization
 {
-    public class UserAuthManager : BaseAuthManager<User>
+    public class UserAuthManager : BaseAuthManager<User, long>
     {
         public UserAuthManager(IPrincipal user, ILogger logger) : base(user, logger)
         {

@@ -6,7 +6,7 @@ using Specifications;
 
 namespace API.Authorization
 {
-    public class UserRoleAuthManager : BaseAuthManager<UserRole>
+    public class UserRoleAuthManager : BaseAuthManager<UserRole, long>
     {
         public UserRoleAuthManager(IPrincipal user, ILogger logger) : base(user, logger)
         {

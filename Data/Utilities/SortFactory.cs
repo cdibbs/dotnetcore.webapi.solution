@@ -5,19 +5,28 @@ using System.Linq.Expressions;
 
 namespace Data.Utilities
 {
-    public class SortFactory<T> : ISortFactory<T> where T: BaseEntity
+    public class SortFactory<T, TKey> : ISortFactory<T, TKey>
+        where T: IEntity<TKey>
+        where TKey: IComparable
     {
         public SortSpecification[] Sorts { get; set; }
+
+        // Selectors must be dynamic, at the time of writing (2017-09-14). EF will not work with expressions of return type object.
         public Dictionary<string, dynamic> Selectors { get; set; }
-        public SortFactory(SortSpecification[] sorts, Dictionary<string, dynamic> availableSelectors)
+        public Expression<Func<IQueryable<T>, IOrderedQueryable<T>>> DefaultSort { get; set; }
+        public SortFactory(
+            SortSpecification[] sorts,
+            Dictionary<string, dynamic> availableSelectors,
+            Expression<Func<IQueryable<T>, IOrderedQueryable<T>>> defaultSort = null)
         {
             this.Sorts = sorts;
             this.Selectors = availableSelectors;
+            this.DefaultSort = defaultSort ?? (t => t.OrderBy(q => q.Id));
         }
 
         public IOrderedQueryable<T> ApplySorts(IQueryable<T> queryable)
         {
-            if (Sorts.Length == 0) return queryable.OrderBy(t => t.Created);
+            if (Sorts.Length == 0) return DefaultSort.Compile()(queryable);
 
             var sorted = ApplySort(queryable, Sorts.First());
             foreach (var sort in this.Sorts.Skip(1))
@@ -54,10 +63,7 @@ namespace Data.Utilities
                 return this.Selectors[fieldName];
             }
 
-            // EF will not work with expressions of return type object.
-            Expression<Func<T, DateTime>> expr = (T t) => t.Created;
-            dynamic dexpr = expr;
-            return dexpr;
+            throw new ArgumentException($"Field '{fieldName}' does not exist in provided selectors.");
         }
     }
 }

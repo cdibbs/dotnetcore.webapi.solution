@@ -2,9 +2,9 @@
 
 namespace Data
 {
-    public interface IBaseEntity : IEntity
+    public interface IBaseEntity : IEntity<long>
     {
-        long Id { get; set; }
+        new long Id { get; set; }
         DateTime Created { get; set; }
         DateTime LastUpdated { get; set; }
         long LastUpdatedBy { get; set; }

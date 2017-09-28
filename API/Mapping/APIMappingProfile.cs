@@ -3,6 +3,7 @@ using API.Models.InputModels;
 using API.Models.ViewModels;
 using AutoMapper;
 using Data;
+using Data.Models;
 using Data.Repositories.ReadOnly;
 
 namespace API.Mapping
@@ -11,10 +12,10 @@ namespace API.Mapping
         public APIMappingProfile()
         {
             //TODO: Create mappings
-            var view = CreateMap<V_Population, PersonViewModel>();
-            CreateMap<V_Population, IViewModel<V_Population, string>>()
+            var view = CreateMap<V_MyView, PersonViewModel>();
+            CreateMap<V_MyView, IViewModel<V_MyView, string>>()
                 .As<PersonViewModel>();
-            view.ForMember(d => d.Id, o => o.MapFrom(s => s.UserId));
+            view.ForMember(d => d.Id, o => o.MapFrom(s => s.Id));
 
             SetupDbModel<User, UserViewModel>();
             SetupDbModel<Role, RoleViewModel>();
@@ -31,7 +32,7 @@ namespace API.Mapping
             var userRoleMap = CreateMap<UserRole, string>();
             userRoleMap.ConvertUsing(r => r.Role.RoleName);
 
-            var ro = CreateMap<V_Population, IViewModel<V_Population, string>>();
+            var ro = CreateMap<V_MyView, IViewModel<V_MyView, string>>();
             ro.As<PersonViewModel>();
         }
 

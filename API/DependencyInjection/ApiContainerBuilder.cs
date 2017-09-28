@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Security.Principal;
+using Data.Models;
 
 namespace API.DependencyInjection
 {
@@ -60,14 +61,14 @@ namespace API.DependencyInjection
             this.RegisterType<DataContext>().As<IDataContext>();
             this.RegisterType<AllDataContext>().As<ISoftDeletedDataContext>();
             this.RegisterType<ReadOnlyDataContext>().As<IReadOnlyDataContext>();
-            this.RegisterType<ReadOnlyRepository>().As<IReadOnlyRepository>();
+            this.RegisterType<ReadOnlyRepository<string>>().As<IReadOnlyRepository<string>>();
         }
 
         private void Specifications()
         {
             this.RegisterType<PopulationSpecificationProvider>()
                 .As<IPopulationSpecificationProvider>()
-                .As<IBaseSpecificationProvider<V_Population>>();
+                .As<IBaseSpecificationProvider<V_MyView>>();
 
             this.RegisterType<UserSpecificationProvider>()
                 .As<IUserSpecificationProvider>()
@@ -84,10 +85,10 @@ namespace API.DependencyInjection
 
         private void AuthorizationManagement()
         {
-            this.RegisterType<UserAuthManager>().As<IAuthManager<User>>();
-            this.RegisterType<UserRoleAuthManager>().As<IAuthManager<UserRole>>();
-            this.RegisterType<RoleAuthManager>().As<IAuthManager<Role>>();
-            this.RegisterType<PopulationAuthManager>().As<IAuthManager<V_Population>>();
+            this.RegisterType<UserAuthManager>().As<IAuthManager<User, long>>();
+            this.RegisterType<UserRoleAuthManager>().As<IAuthManager<UserRole, long>>();
+            this.RegisterType<RoleAuthManager>().As<IAuthManager<Role, long>>();
+            this.RegisterType<PopulationAuthManager>().As<IAuthManager<V_MyView, string>>();
         }
 
         private void InputValidation()
@@ -101,7 +102,7 @@ namespace API.DependencyInjection
         {
             this.RegisterType<UserManager>().As<IBaseManager<User, long>>();
             this.RegisterType<RoleManager>().As<IBaseManager<Role, long>>();
-            this.RegisterType<PopulationManager>().As<IBaseManager<V_Population, string>>();
+            this.RegisterType<PopulationManager>().As<IBaseManager<V_MyView, string>>();
             this.RegisterType<UserRoleManager>().As<IBaseManager<UserRole, long>>();
         }
 

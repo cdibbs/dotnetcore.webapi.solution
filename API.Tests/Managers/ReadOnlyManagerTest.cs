@@ -11,6 +11,7 @@ using Specifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Data.Models;
 
 namespace API.Tests.Managers
 {
@@ -23,10 +24,10 @@ namespace API.Tests.Managers
         public void Initialize()
         {
             Manager = new PopulationManager(
-                Mock.Of<IReadOnlyRepository>(),
+                Mock.Of<IReadOnlyRepository<string>>(),
                 Mock.Of<IMapper>(),
                 Mock.Of<ILogger>(),
-                Mock.Of<IAuthManager<V_Population>>(),
+                Mock.Of<IAuthManager<V_MyView, string>>(),
                 Mock.Of<IPopulationSpecificationProvider>()
             );
         }
@@ -47,13 +48,13 @@ namespace API.Tests.Managers
         public void Get_AuthFiltered()
         {
             // Setup
-            var filter = Specification<V_Population>.Start(c => true);
-            var s = Mock.Of<ISpecification<V_Population>>();
+            var filter = Specification<V_MyView>.Start(c => true);
+            var s = Mock.Of<ISpecification<V_MyView>>();
             Mock.Get(s)
-                .Setup(sp => sp.And(It.Is<ISpecification<V_Population>>(ss => ss == filter)))
+                .Setup(sp => sp.And(It.Is<ISpecification<V_MyView>>(ss => ss == filter)))
                 .Verifiable();
             Mock.Get(Manager.Specs)
-                .Setup(sp => sp.PopulationByUsername<V_Population>(It.IsAny<string>()))
+                .Setup(sp => sp.ByUserId<V_MyView>(It.IsAny<string>()))
                 .Returns(s);
 
             var rm = Mock.Get(Manager.Auth);
@@ -62,7 +63,7 @@ namespace API.Tests.Managers
                 .Verifiable();
             var mrepo = Mock.Get(Manager.Repo);
             mrepo.Setup(m => m.FindOne(
-                    It.IsAny<ISpecification<V_Population>>(),
+                    It.IsAny<ISpecification<V_MyView>>(),
                     Manager.GetIncludes))
                     .Verifiable();
 
@@ -79,10 +80,10 @@ namespace API.Tests.Managers
         public void Filter_AuthFiltered()
         {
             // Setup
-            var filter = Specification<V_Population>.Start(c => true);
-            var s = Mock.Of<ISpecification<V_Population>>();
+            var filter = Specification<V_MyView>.Start(c => true);
+            var s = Mock.Of<ISpecification<V_MyView>>();
             Mock.Get(s)
-                .Setup(sp => sp.And(It.Is<ISpecification<V_Population>>(ss => ss == filter)))
+                .Setup(sp => sp.And(It.Is<ISpecification<V_MyView>>(ss => ss == filter)))
                 .Verifiable();
 
             var rm = Mock.Get(Manager.Auth);
@@ -91,8 +92,8 @@ namespace API.Tests.Managers
                 .Verifiable();
             var mrepo = Mock.Get(Manager.Repo);
             mrepo.Setup(m => m.Page(
-                    It.IsAny<ISpecification<V_Population>>(), It.IsAny<ISortFactory<V_Population>>(), 0, 0))
-                    .Returns(new List<V_Population>().AsQueryable().OrderBy(l => l.Username))
+                    It.IsAny<ISpecification<V_MyView>>(), It.IsAny<ISortFactory<V_MyView, string>>(), 0, 0))
+                    .Returns(new List<V_MyView>().AsQueryable().OrderBy(l => l.Id))
                     .Verifiable();
 
             // Test

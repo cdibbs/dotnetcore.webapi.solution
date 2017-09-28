@@ -15,6 +15,6 @@ namespace API.Validators
         /// Throws a custom exception whenever a bad input is received.
         /// </summary>
         /// <param name="input">User input to validate.</param>
-        void Validate(IInputModel<T> input);
+        void Validate(IInputModel<T, long> input);
     }
 }

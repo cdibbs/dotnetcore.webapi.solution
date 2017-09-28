@@ -16,7 +16,7 @@ namespace Data
         IEnumerable<T> Page<T>(
             ISpecification<T> spec,
             int offsetPage = 0, int pageSize = 10,
-            ISortFactory<T> sortFactory = null,
+            ISortFactory<T, long> sortFactory = null,
             bool track = false, bool incSoftDel = false,
             params Expression<Func<T, object>>[] includes)
             where T : BaseEntity;

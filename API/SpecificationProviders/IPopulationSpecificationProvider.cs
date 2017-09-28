@@ -1,14 +1,14 @@
 ﻿using API.Models.FilterModels;
+using Data.Models;
 using Data.Repositories.ReadOnly;
 using Specifications;
 
 namespace API.SpecificationProviders
 {
-    public interface IPopulationSpecificationProvider : IBaseSpecificationProvider<V_Population>
+    public interface IPopulationSpecificationProvider : IBaseSpecificationProvider<V_MyView>
     {
-        ISpecification<T> ByUserId<T>(string userId) where T : V_Population;
-        ISpecification<T> PopulationByFilter<T>(PopulationFilterModel filter) where T : V_Population;
-        ISpecification<U> PopulationByUsername<U>(string username) where U : V_Population;
-        ISpecification<T> PopulationFilterByUsername<T>(PopulationFilterModel filter) where T : V_Population;
+        ISpecification<T> ByUserId<T>(string userId) where T : V_MyView;
+        ISpecification<T> PopulationByMemberType<T>(string memberType) where T : V_MyView;
+
     }
 }

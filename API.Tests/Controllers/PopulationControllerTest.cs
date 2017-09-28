@@ -12,11 +12,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Specifications;
 using System;
+using Data.Models;
 
 namespace API.Tests
 {
     [TestClass]
-    public class PopulationControllerTest : BaseControllerTest<PopulationController, V_Population, string>
+    public class PopulationControllerTest : BaseControllerTest<PopulationController, V_MyView, string>
     {
         [TestInitialize]
         public void Setup()
@@ -34,7 +35,7 @@ namespace API.Tests
             var result = new PersonViewModel[0];
             var ctrl = GetController(Mock.Of<IPopulationSpecificationProvider>());
             Mock.Get(ctrl.Manager)
-                .Setup(c => c.Filter(It.IsAny<ISpecification<V_Population>>(), 
+                .Setup(c => c.Filter(It.IsAny<ISpecification<V_MyView>>(), 
                     It.IsAny<int>(), It.IsAny<int>(), It.IsAny<SortSpecification[]>()))
                 .Returns(result);
 
@@ -43,7 +44,7 @@ namespace API.Tests
 
             // Examine
             Mock.Get(ctrl.Manager)
-                .Verify(c => c.Filter(It.IsAny<ISpecification<V_Population>>(),
+                .Verify(c => c.Filter(It.IsAny<ISpecification<V_MyView>>(),
                     It.Is<int>(i => i == 3), It.Is<int>(i => i == 14), It.IsAny<SortSpecification[]>()),
                     Times.Once);
             Assert.AreEqual(result, actualResult);

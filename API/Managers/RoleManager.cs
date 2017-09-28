@@ -9,7 +9,7 @@ namespace API.Managers
 {
     public class RoleManager : BaseManager<Role>
     {
-        public RoleManager(IRepository repo, IMapper mapper, IValidator<Role> validator, ILogger logger, IAuthManager<Role> auth, IRoleSpecificationProvider specs)
+        public RoleManager(IRepository repo, IMapper mapper, IValidator<Role> validator, ILogger logger, IAuthManager<Role, long> auth, IRoleSpecificationProvider specs)
             : base(repo, mapper, validator, logger, auth, specs)
         {
         }

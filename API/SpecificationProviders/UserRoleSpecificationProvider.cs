@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace API.SpecificationProviders
 {
-    public class UserRoleSpecificationProvider : BaseSpecificationProvider<UserRole>, IUserRoleSpecificationProvider
+    public class UserRoleSpecificationProvider : BaseSpecificationProvider<UserRole, long>, IUserRoleSpecificationProvider
     {
         public ISpecification<T> UserRolesByFilter<T>(FilterModel filter) where T : UserRole
         {

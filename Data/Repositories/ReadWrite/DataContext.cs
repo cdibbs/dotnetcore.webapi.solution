@@ -46,7 +46,7 @@ namespace Data
 
         public DbSet<UserRole> UserRoles { get; set; }
       
-        public DbSet<T> ISet<T>() where T: class => Set<T>();
+        public virtual DbSet<T> ISet<T>() where T: class => Set<T>();
 
         public void Save()
         {
@@ -69,18 +69,17 @@ namespace Data
             foreach (var change in ChangeTracker.Entries())
             {
                 var e = change.Entity as BaseEntity;
+                var now = DateTime.Now;
+                if (e == null) continue;
+
                 if (change.State == EntityState.Added)
                 {
-                    if (e != null)
-                    {
-                        e.Created = DateTime.Now;
-                        e.LastUpdated = DateTime.Now;
-                        e.LastUpdatedBy = u.Id;
-
-                    }
+                    e.Created = now;
+                    e.LastUpdated = now;
+                    e.LastUpdatedBy = u.Id;
                 } else if (change.State == EntityState.Modified)
                 {
-                    e.LastUpdated = DateTime.Now;
+                    e.LastUpdated = now;
                     e.LastUpdatedBy = u.Id;
                 }
             }

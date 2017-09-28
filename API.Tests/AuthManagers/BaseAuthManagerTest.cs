@@ -13,7 +13,7 @@ namespace API.Tests.AuthManagers
     [TestClass]
     public class BaseAuthManagerTest
     {
-        public BaseAuthManager<User> AuthMock(string[] roles)
+        public BaseAuthManager<User, long> AuthMock(string[] roles)
         {
             var user = Mock.Of<IPrincipal>(u => u.Identity.Name == "unittest");
             Mock.Get(user)
@@ -22,7 +22,7 @@ namespace API.Tests.AuthManagers
             Mock.Get(user)
                 .Setup(u => u.IsInRole(It.Is<string>(s => ! roles.Contains(s))))
                 .Returns(false);
-            var AuthM = new BaseAuthManager<User>(
+            var AuthM = new BaseAuthManager<User, long>(
                 user: user,
                 logger: Mock.Of<ILogger>()
             );

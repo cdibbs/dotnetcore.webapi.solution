@@ -7,7 +7,7 @@ using Data;
 
 namespace API.Models.ViewModels
 {
-    public interface IViewModel<T> : IViewModel<T, long> where T: IEntity
+    public interface IViewModel<T> : IViewModel<T, long> where T: IEntity<long>
     {
         long Id { get; set; }
     }

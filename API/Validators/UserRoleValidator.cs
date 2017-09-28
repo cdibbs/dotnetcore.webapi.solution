@@ -7,7 +7,7 @@ namespace API.Validators
 {
     public class UserRoleValidator : IValidator<UserRole>
     {
-        public void Validate(IInputModel<UserRole> input)
+        public void Validate(IInputModel<UserRole, long> input)
         {
             var i = input as UserRoleInputModel;
             if (i == null)

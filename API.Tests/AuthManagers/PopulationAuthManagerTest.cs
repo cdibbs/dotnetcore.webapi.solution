@@ -6,6 +6,7 @@ using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
+using Data.Models;
 using LinqKit;
 
 namespace API.Tests.AuthManagers
@@ -13,9 +14,9 @@ namespace API.Tests.AuthManagers
     [TestClass]
     public class PopulationAuthManagerTest
     {
-        public List<V_Population> AllPeople = new List<V_Population>()
+        public List<V_MyView> AllPeople = new List<V_MyView>()
         {
-            new V_Population()
+            new V_MyView()
         };
 
         public PopulationAuthManager AuthMock(string[] roles)

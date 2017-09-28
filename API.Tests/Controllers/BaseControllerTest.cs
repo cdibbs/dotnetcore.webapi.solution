@@ -17,8 +17,9 @@ using API.SpecificationProviders;
 namespace API.Tests
 {
     public abstract class BaseControllerTest<T, U, UKey> //: BaseApiController<U, UViewModel> 
+        where UKey: IComparable
         where T: BaseApiController<U, UKey>
-        where U: IEntity
+        where U: IEntity<UKey>
     {
         protected MapperConfiguration MapperConfig { get; set; }
         protected string myUserId = "myid";

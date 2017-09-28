@@ -6,6 +6,7 @@ using API.Models.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AutoMapper;
 using Data;
+using Data.Models;
 using Data.Repositories.ReadOnly;
 
 namespace API.Tests
@@ -63,28 +64,6 @@ namespace API.Tests
 
             // TODO: As this evolves, update, possibly assert on properties.
             Assert.AreEqual(min.Username, mout.Username);
-        }
-
-        [TestMethod, TestCategory("Mapper")]
-        public void V_Population_ViewModel_MapsWithoutError()
-        {
-            var min = new V_Population()
-            {
-                Username = "one", UserId = "000001",
-                First = "Seven", Middle = "Of", Last = "Nine",
-                Email = "we@borg.com",
-                Title = "Mind of the Hive, Hive Mind"
-            };
-            var mout = (PersonViewModel)Mapper.Map<IViewModel<V_Population, string>>(min);
-
-            // TODO: As this evolves, update, possibly assert on properties.
-            Assert.AreEqual(min.Username, mout.Username);
-            Assert.AreEqual(min.UserId, mout.Id);
-            Assert.AreEqual(min.First, mout.First);
-            Assert.AreEqual(min.Middle, mout.Middle);
-            Assert.AreEqual(min.Last, mout.Last);
-            Assert.AreEqual(min.Email, mout.Email);
-            Assert.AreEqual(min.Title, mout.Title);
         }
     }
 }
