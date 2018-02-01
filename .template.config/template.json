@@ -2,16 +2,23 @@
   "author": "Chris Dibbern",
   "classifications": [ "WebAPI", "Data", "Boilerplate" ], // Tags used to search for the template.
   "name": "WebAPI and Data template solution",
-  "identity": "cdibbs.webapi",   // A unique ID for the project template.
-  "shortName": "cawa",                 // You can create the project using this short name instead of the one above.
+  "identity": "appdev.webapi",   // A unique ID for the project template.
+  "shortName": "appdev.webapi",                 // You can create the project using this short name instead of the one above.
   "tags": {
     "language": "C#"                      // Specify that this template is in C#.
   },
-  "sourceName": "dotnet.webapi.solution",            // Name that will be replaced in projects and solution.
+  "sourceName": "dotnetcore.webapi.solution",            // Name that will be replaced in projects and solution.
   "guids": [ // Guids used in the project that will be replaced by new ones.
     "6F2B2312-B8ED-478F-83F0-1E68AA9DD373",
     "21aef455-4df4-4a81-94ee-3c86c0a73f3d",
     "943D0235-A503-4D2A-8402-12B01904B5D3",
     "82a7f48d-3b50-4b1e-b82e-3ada8210c358"
+  ],
+  "sources": [
+	{
+		"source": "./",
+		"include": "**/*",
+		"exclude": [ "**/.git", "**/.vs", "**/[Bb]in/**", "**/[Oo]bj/**", ".template.config/**/*", "**/*.filelist", "**/*.user", "**/*.lock.json" ]
+	}
   ]
 }
